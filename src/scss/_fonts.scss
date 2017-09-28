@@ -1,0 +1,25 @@
+$font--header: 'Chonburi', cursive;
+$font--para: 'Lato', sans-serif;
+
+@mixin font-header {
+  font-family: $font--header;
+}
+
+@mixin font-paragraph {
+  color: $color--dark-grey;
+  font-family: $font--para;
+}
+
+body { @include font-paragraph();}
+h1,h2,h3 { @include font-header(); color: $color--grey; }
+h4,h5 { @include font-paragraph(); color: $color--grey; } 
+
+p {
+  white-space: pre-line;
+}
+
+.note__date {
+  font-weight: 400;
+  letter-spacing: 1.5px;
+}
+
