@@ -1,2 +1,14 @@
+$color--light-grey: #EEEEEE;
 $color--grey: #95989A;
 $color--dark-grey: #6E6E6E;
+$color--purple: #990082;
+
+$tablet: "(min-width: 768px)";
+$tablet--landscape: "(min-width: 768px) and  (orientation: landscape)";
+$desktop: "(min-width: 1024px)";
+$desktop--landscape: "(min-width: 1024px) and (orientation: landscape)";
+
+@mixin underline {
+  padding-bottom: 0.3em;
+  border-bottom: solid 2px $color--light-grey;
+}

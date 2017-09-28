@@ -1,7 +1,8 @@
 var http     = require('http'),
 	express  = require('express'),
-	mysql    = require('mysql')
-	parser   = require('body-parser');
+	mysql    = require('mysql'),
+	parser   = require('body-parser'),
+	cors = require('cors');
  
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -17,6 +18,8 @@ try {
 }
  
 var app = express();
+app.use(cors());
+app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 app.set('port', process.env.PORT || 5000);
  
@@ -50,11 +53,11 @@ app.post('/notes', function (req,res) {
 	var response = [];
  
 	if (
-		typeof req.body.user !== 'undefined' && 
-		typeof req.body.name !== 'undefined' && 
-		typeof req.body.text !== 'undefined'
+		typeof req.body.notes_user !== 'undefined' && 
+		typeof req.body.notes_name !== 'undefined' && 
+		typeof req.body.notes_text !== 'undefined'
 	) {
-		var user = req.body.user, name = req.body.name, text = req.body.text;
+		var user = req.body.notes_user, name = req.body.name, text = req.body.notes_text;
  
 		connection.query('INSERT INTO notes_notes (notes_user, notes_name, notes_text) VALUES (?, ?, ?)', 
 			[user, name, text], 
@@ -83,7 +86,8 @@ app.post('/notes', function (req,res) {
 
 app.post('/notes/edit/:id', function (req,res) {
 	var id = req.params.id, response = [];
- 
+	console.log(req.body.name);
+
 	if (
 		typeof req.body.name !== 'undefined' && 
 		typeof req.body.text !== 'undefined' 

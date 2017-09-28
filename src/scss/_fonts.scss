@@ -1,5 +1,6 @@
 $font--header: 'Chonburi', cursive;
 $font--para: 'Lato', sans-serif;
+$font--fancy: 'Damion', cursive;
 
 @mixin font-header {
   font-family: $font--header;
@@ -14,12 +15,59 @@ body { @include font-paragraph();}
 h1,h2,h3 { @include font-header(); color: $color--grey; }
 h4,h5 { @include font-paragraph(); color: $color--grey; } 
 
+
+h1 {
+  margin-bottom: 0; 
+  font-size: 2.3em;
+}
+h2 {
+  font-size: 2em;
+}
+h4 {
+  margin-top: 0.6em;
+}
+
 p {
+  font-size: 1em;
   white-space: pre-line;
 }
 
 .note__date {
   font-weight: 400;
   letter-spacing: 1.5px;
+  display: block;
 }
+
+.note__edit-header {
+  margin-top: 0.65em;
+  border: none;
+  width: 100%;
+  border-bottom: dotted 2px $color--light-grey;
+  outline: none;
+
+  font-weight: 700;
+  @include font-header();
+  font-size: 1.2em;
+  color: $color--purple;  
+
+  @media #{$tablet} {
+    font-size: 2em;
+  }
+}
+
+.note__edit-text {
+  border: dotted 2px $color--light-grey; 
+  resize: none;
+  overflow: hidden;
+  min-height: 50px;
+  width: 100%;
+  outline: none;
+
+  @include font-paragraph();
+  @extend p;
+
+  color: $color--purple;
+}
+
+
 
