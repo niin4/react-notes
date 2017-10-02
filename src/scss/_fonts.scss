@@ -18,24 +18,56 @@ h4,h5 { @include font-paragraph(); color: $color--grey; }
 
 h1 {
   margin-bottom: 0; 
-  font-size: 2.3em;
+  font-size: 1.8em;
+  @media #{$tablet} {
+    font-size: 2.3em;
+  }
 }
 h2 {
-  font-size: 2em;
+  font-size: 1.4em;
+  @media #{$tablet} {
+    font-size: 2em;
+  }
+}
+h3 {
+  font-size: 1.2em;
+  @media #{$tablet} {
+    font-size: 1.6em;
+  }
 }
 h4 {
+  font-size: 1em;
+  @media #{$tablet} {
+    font-size: 1.2em;
+  }
   margin-top: 0.6em;
 }
 
 p {
-  font-size: 1em;
+  font-size: 0.9em;
+  line-height: 1.4em;
   white-space: pre-line;
+  @media #{$tablet} {
+    font-size: 1em;
+    line-height: 1.6em;
+  }
+}
+
+li {
+  font-size: 0.9em;
+  @media #{$tablet} {
+    font-size: 1em;
+  }
 }
 
 .note__date {
+  font-size: 0.9em;
   font-weight: 400;
   letter-spacing: 1.5px;
   display: block;
+  @media #{$tablet} {
+    font-size: 1em;
+  }
 }
 
 .note__edit-header {
@@ -59,6 +91,7 @@ p {
   border: dotted 2px $color--light-grey; 
   resize: none;
   overflow: hidden;
+  box-sizing: border-box;
   min-height: 50px;
   width: 100%;
   outline: none;

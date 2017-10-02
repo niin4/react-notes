@@ -21,7 +21,7 @@ var app = express();
 app.use(cors());
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
-app.set('port', process.env.PORT || 5000);
+app.set('port', process.env.PORT || 5050);
  
 app.get('/', function (req, res) {
 	
@@ -30,7 +30,29 @@ app.get('/', function (req, res) {
 app.get('/notes/:id', function (req,res) {
 	var id = req.params.id;
  
-	connection.query('SELECT * from notes_notes where notes_user = ?', [id], function(err, rows, fields) {
+	connection.query('SELECT * from notes_notes where notes_user = ? ORDER BY notes_date DESC', [id], function(err, rows, fields) {
+  		if (!err){
+  			var response = [];
+
+			if (rows.length != 0) {
+				response.push({'result' : 'success', 'data' : rows});
+			} else {
+				response.push({'result' : 'error', 'msg' : 'No Results Found'});
+			}
+ 
+			res.setHeader('Access-Control-Allow-Origin', '*');
+	    	res.status(200).send(response);
+  		} else {
+		    res.status(400).send(err);
+				
+	  	}
+	});
+});
+
+app.get('/notes/note/:id', function (req,res) {
+	var id = req.params.id;
+ 
+	connection.query('SELECT * from notes_notes where notes_id = ?', [id], function(err, rows, fields) {
   		if (!err){
   			var response = [];
 
@@ -53,19 +75,19 @@ app.post('/notes', function (req,res) {
 	var response = [];
  
 	if (
-		typeof req.body.notes_user !== 'undefined' && 
-		typeof req.body.notes_name !== 'undefined' && 
-		typeof req.body.notes_text !== 'undefined'
+		typeof req.body.user !== 'undefined' && 
+		typeof req.body.name !== 'undefined' && 
+		typeof req.body.text !== 'undefined'
 	) {
-		var user = req.body.notes_user, name = req.body.name, text = req.body.notes_text;
+		var user = req.body.user, name = req.body.name, text = req.body.text;
  
 		connection.query('INSERT INTO notes_notes (notes_user, notes_name, notes_text) VALUES (?, ?, ?)', 
 			[user, name, text], 
 			function(err, result) {
 		  		if (!err){
  
-					if (result.affectedRows != 0) {
-						response.push({'result' : 'success'});
+					if (result.affectedRows != 0) {			
+						response.push({'result' : 'success','InsertId':result.insertId});
 					} else {
 						response.push({'msg' : 'No Result Found'});
 					}

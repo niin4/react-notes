@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 var ReactMarkdown = require('react-markdown');
 import Moment from 'react-moment';
 
+import Modal from '../components/Modal';
+
+const apiEndPoint = 'http://localhost:5050/notes/';
+
 function setHeight() {
   document.getElementById('noteText').style.height = "5px";
   document.getElementById('noteText').style.height = (document.getElementById('noteText').scrollHeight)+"px";
@@ -18,7 +22,8 @@ class App extends Component {
     notes:[],
       active: {},
       editing: false,
-      button: 'Edit'
+      button: 'Edit',
+      modal: false
     };
 
     this.updateNote = this.updateNote.bind(this);
@@ -29,6 +34,12 @@ class App extends Component {
     this.editNoteHeader = this.editNoteHeader.bind(this);
     this.editNoteText = this.editNoteText.bind(this);
     this.updateList = this.updateList.bind(this);
+    this.addNewNote = this.addNewNote.bind(this);
+    this.saveNewNote = this.saveNewNote.bind(this);
+    this.confirmDelete = this.confirmDelete.bind(this);
+    this.toggleModal = this.toggleModal.bind(this);
+    this.deleteNote = this.deleteNote.bind(this);
+    this.getNote = this.getNote.bind(this);
   }
   componentDidMount() {
     this.notesList();
@@ -39,7 +50,11 @@ class App extends Component {
     if (this.state.editing) {
       this.setState({button: 'Edit'});
       setHeight();
-      this.updateNote();
+      if (this.state.active.notes_id) {
+        this.updateNote();
+      } else {
+        this.saveNewNote();
+      }
     } else {
       this.setState({button: 'Save'});
     }
@@ -56,7 +71,8 @@ class App extends Component {
     this.setState({active});
   }
 
-  normalNote() {
+
+  normalNote() {    
     return ( 
       <div className="note__container">    
         <h1>{this.state.active.notes_name}</h1>
@@ -65,7 +81,7 @@ class App extends Component {
           <div className="note__content">
           <ReactMarkdown source={this.state.active.notes_text}></ReactMarkdown>
           </div>
-          : <p>Loading...</p>}
+          : <p></p>}
       </div>
     )
   }
@@ -75,13 +91,13 @@ class App extends Component {
       <div className="note__container">    
         <textarea wrap="soft" rows="1" className="note__edit-header" defaultValue={this.state.active.notes_name} onChange={this.editNoteHeader}></textarea>
           <h4 className="note__date"><Moment format="Do MMMM YYYY" date={this.state.active.notes_date}/></h4>
-          <textarea id="noteText" className="note__edit-text" value={this.state.active.notes_text} onChange={this.editNoteText} ></textarea>
+          <textarea id="noteText" className="note__edit-text" value={this.state.active.notes_text} onKeyUp={auto_grow} onChange={this.editNoteText} ></textarea>
       </div>
     )
   }
 
   updateNote(){
-    fetch('http://localhost:5000/notes/edit/'+this.state.active.notes_id, {
+    fetch(apiEndPoint+'edit/'+this.state.active.notes_id, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -101,8 +117,45 @@ class App extends Component {
     });      
   }
 
+  saveNewNote(){
+    fetch(apiEndPoint, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user: this.state.active.notes_user,
+        name: this.state.active.notes_name,
+        text: this.state.active.notes_text
+      })
+      })
+    .then(response => {
+      return response.json();
+    }).then(result => {
+      console.log(result);
+      if (result[0].result == 'success') {
+        this.updateList();
+        this.getNote(result[0].InsertId);
+      }
+    });      
+  }
+
+  // TODO: Update user id
+  addNewNote() {
+    this.setState({
+      active: {
+        notes_name: '',
+        notes_text: '',
+        notes_user: 1
+      },
+      editing: true,
+      button: 'Save'
+    })
+  }
+
   updateList() {
-    fetch('http://localhost:5000/notes/1/')
+    fetch(apiEndPoint+'1/')
     .then((response) => {
       return response.json();
     }).then(data => {        
@@ -110,8 +163,18 @@ class App extends Component {
    }) 
   }
 
+  getNote(id) {
+    fetch(apiEndPoint+'note/'+id)
+    .then((response) => {
+      return response.json();
+    }).then(data => {        
+      console.log(data);
+      this.setState({active:data[0].data[0]});
+   }) 
+  }
+
   notesList() {
-    fetch('http://localhost:5000/notes/1/')
+    fetch(apiEndPoint+'1/')
       .then((response) => {
         return response.json();
       }).then(data => {        
@@ -119,6 +182,17 @@ class App extends Component {
         this.updateActive(this.state.notes[0]);
      }) 
   }
+
+  deleteNote() {
+  fetch(apiEndPoint+'delete/'+this.state.active.notes_id, {
+    method: 'Delete'})    
+    .then((response) => {
+      return response.json();
+      console.log(response.json());
+    }).then(() => {        
+      this.notesList();
+   }) 
+ }
 
   updateActive(e) {
     this.setState({active:e, editing: false});
@@ -128,6 +202,15 @@ class App extends Component {
     if (prevState.editing !== this.state.editing && this.state.editing) {
       setHeight();
     }
+  }
+  toggleModal() {
+    this.setState({modal: !this.state.modal})
+  }
+
+  confirmDelete() {
+    this.setState({modal: !this.state.modal})
+    console.log('delete note id '+this.state.active.notes_id);
+    this.deleteNote();
   }
 
   render() {
@@ -143,6 +226,7 @@ class App extends Component {
             : <li>Loading...</li>
           }
          </ul>
+         <button className="button--fancy" onClick={this.addNewNote}>Add new</button>
         </div>
         { this.state.active ?
         <div className="note">
@@ -150,10 +234,11 @@ class App extends Component {
             this.editingNote() : this.normalNote()
           }
           <button id="editButton" className={this.state.editing? 'button--fancy--active':'button--fancy'} onClick={this.toggleEditing}>{this.state.button}</button>
-          <button id="deleteButton" className="button--fancy">Delete</button>
+          <button id="deleteButton" className="button--fancy" onClick={this.toggleModal}>Delete</button>
         </div>
         : <p>Loading...</p>
         }
+        <Modal shown={this.state.modal} onClose={this.toggleModal} confirmDelete={this.confirmDelete}/>
       </div>
     );
   }

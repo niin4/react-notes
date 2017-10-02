@@ -7,6 +7,7 @@ html {
 }
 
 body {
+  position: relative;
   margin: 0; padding: 0;  
   background-color: $color--light-grey;
 }
@@ -27,6 +28,10 @@ body {
 }
 
 .note {  
+  order: 1;
+  @media #{$tablet} {
+    order: 2;
+  }  
   padding: 1em 0.8em;
   flex: 0 1 75%; 
   position: relative;
@@ -39,6 +44,7 @@ body {
   @media #{$desktop} {
     padding: 1em 3em;
   }
+  
   -webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
   -moz-animation: fadein 2s; /* Firefox < 16 */
    -ms-animation: fadein 2s; /* Internet Explorer */
@@ -48,6 +54,10 @@ body {
   }
 
 .note-list {
+  order: 2;
+  @media #{$tablet} {
+    order: 1;
+  }
   flex: 0 1 25%; 
   padding: 0 0.8em;
 
@@ -63,7 +73,6 @@ body {
 
   h2 {
     display: block;
-
     @include underline();
   }
 
@@ -73,7 +82,6 @@ body {
     list-style: none;
 
     li {
-      font-size: 1em;
       margin-bottom: 1em;
       cursor: pointer;
     }
@@ -109,6 +117,38 @@ body {
   border: dotted 2px $color--grey;
 }
 
+.button--close {
+  @extend .button--fancy--active;
+  border: none;
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+}
+.modal__bg {
+  position: fixed;
+  right: 0;
+  top:0;
+  left: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 888;
+}
+
+.modal {
+  padding: 1em;
+  background-color: #fff;
+  border: solid 2px $color--light-grey;
+  text-align: center;
+  width: 400px;
+  height: 120px;
+  display: block;
+  position: fixed;
+  top: 50%;
+  margin-top: -60px;
+  margin-left: -200px;
+  left: 50%;
+  z-index: 999;
+}
 
 // ANIMATIONS
 
